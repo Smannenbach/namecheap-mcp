@@ -35,6 +35,7 @@ export function registerSslTools(server: McpServer, getClient: () => NamecheapCl
       inputSchema: {
         type: z.string().describe('Certificate product type, e.g. "PositiveSSL", "PositiveSSL Wildcard"'),
         years: z.number().int().min(1).max(3).describe('Certificate validity in years (1–3)'),
+        confirmMutation: z.literal(true).describe('Must be true to approve this billable SSL purchase.'),
       },
     },
     async ({ type, years }) => {
@@ -87,6 +88,7 @@ export function registerSslTools(server: McpServer, getClient: () => NamecheapCl
         approverEmail: z.string().optional().describe('Email address for DCV approval (must be admin@, webmaster@, etc. for the domain)'),
         httpDcv: z.boolean().optional().describe('Use HTTP file-based domain control validation'),
         cnameDcv: z.boolean().optional().describe('Use CNAME-based domain control validation'),
+        confirmMutation: z.literal(true).describe('Must be true to approve this certificate activation.'),
       },
     },
     async ({ certificateId, csr, adminFirstName, adminLastName, adminAddress1, adminCity, adminStateProvince, adminPostalCode, adminCountry, adminPhone, adminEmailAddress, approverEmail, httpDcv, cnameDcv }) => {
@@ -141,6 +143,7 @@ export function registerSslTools(server: McpServer, getClient: () => NamecheapCl
         approverEmail: z.string().optional().describe('Approver email for DCV'),
         httpDcv: z.boolean().optional().describe('Use HTTP file-based DCV'),
         cnameDcv: z.boolean().optional().describe('Use CNAME-based DCV'),
+        confirmMutation: z.literal(true).describe('Must be true to approve this certificate reissue.'),
       },
     },
     async ({ certificateId, csr, adminEmailAddress, adminFirstName, adminLastName, adminAddress1, adminCity, adminStateProvince, adminPostalCode, adminCountry, adminPhone, approverEmail, httpDcv, cnameDcv }) => {

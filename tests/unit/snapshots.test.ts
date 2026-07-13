@@ -38,8 +38,10 @@ describe('snapshots', () => {
     expect(p).toBeTruthy();
     expect(p!.startsWith(SNAPSHOTS_DIR)).toBe(true);
     expect(fs.existsSync(p!)).toBe(true);
-    const stat = fs.statSync(p!);
-    expect(stat.mode & 0o777).toBe(0o600);
+    if (process.platform !== 'win32') {
+      const stat = fs.statSync(p!);
+      expect(stat.mode & 0o777).toBe(0o600);
+    }
   });
 
   it('round-trips via readSnapshot', () => {

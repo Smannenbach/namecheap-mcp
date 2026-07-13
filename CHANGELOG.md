@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased — Smannenbach maintained fork
+
+### Registrar state and mutation safety
+
+- `get_domain_info` now combines an exact-match `domains.getList` result, `domains.getInfo`, and the dedicated `domains.getRegistrarLock` endpoint. Missing state is `null`, and the list-level lock is exposed separately from authoritative transfer lock.
+- `set_registrar_lock` now requires explicit approval, validates `IsSuccess`, and requires a matching dedicated post-write readback.
+- `set_domain_autorenew` now fails closed with zero provider calls because Namecheap publishes no domain auto-renew mutation command.
+- Domain privacy parsing supports documented child elements and legacy/current attribute variants. Privacy enable requires the documented forwarding email; enable, disable, and renewal validate provider acknowledgement and exact-domain readback.
+- Every active provider mutation tool now requires a literal confirmation input.
+
+### Local runtime and verification
+
+- Clean Windows installs no longer fail on the Unix-only `chmod` build step.
+- A sanitized `smoke:readonly` command verifies the built MCP server and authoritative registrar sources without exposing credentials or changing provider state.
+- Dependency resolution is updated to a zero-finding `npm audit`, and the snapshot permission test now handles Windows filesystem mode semantics.
+
 ## [1.5.0] — 2026-04-21
 
 ### Dependency upgrades
