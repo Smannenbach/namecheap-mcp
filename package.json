@@ -2,6 +2,11 @@
   "name": "@ringo380/namecheap-mcp",
   "version": "1.5.0",
   "description": "MCP server for the Namecheap API — domains, DNS, SSL, and account management",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Smannenbach/namecheap-mcp.git"
+  },
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -13,13 +18,14 @@
     "src/"
   ],
   "scripts": {
-    "build": "tsc && chmod +x dist/index.js dist/setup.js",
+    "build": "tsc && node scripts/make-executable.mjs",
     "prepare": "npm run build",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "smoke:readonly": "node scripts/read-only-smoke.mjs",
     "release": "bash scripts/release.sh",
     "release:dry": "bash scripts/release.sh --dry-run"
   },
@@ -35,5 +41,8 @@
     "tsx": "^4.7.0",
     "typescript": "^5.4.0",
     "vitest": "^4.1.4"
+  },
+  "overrides": {
+    "esbuild": "0.28.1"
   }
 }

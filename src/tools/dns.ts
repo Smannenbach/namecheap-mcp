@@ -241,6 +241,7 @@ export function registerDnsTools(server: McpServer, getClient: () => NamecheapCl
           'By default this is refused because it almost always indicates a parse/API failure that would wipe the zone on write. ' +
           'Only set true if you are certain the zone is legitimately empty (e.g. freshly provisioned).'
         ),
+        confirmMutation: z.literal(true).describe('Must be true to approve this DNS mutation.'),
       },
     },
     async ({ domainName, operation, record, allowEmptyBaseline }) => {
@@ -455,7 +456,10 @@ export function registerDnsTools(server: McpServer, getClient: () => NamecheapCl
     'set_dns_default',
     {
       description: "Switch a domain back to using Namecheap's default DNS servers. Use this to revert from custom nameservers.",
-      inputSchema: { domainName: z.string().describe('The domain name, e.g. "example.com"') },
+      inputSchema: {
+        domainName: z.string().describe('The domain name, e.g. "example.com"'),
+        confirmMutation: z.literal(true).describe('Must be true to approve this nameserver mutation.'),
+      },
     },
     async ({ domainName }) => {
       try {
@@ -477,6 +481,7 @@ export function registerDnsTools(server: McpServer, getClient: () => NamecheapCl
         domainName: z.string().describe('The domain name, e.g. "example.com"'),
         nameservers: z.array(z.string()).min(2).max(12)
           .describe('List of nameserver hostnames, e.g. ["ns1.cloudflare.com", "ns2.cloudflare.com"]'),
+        confirmMutation: z.literal(true).describe('Must be true to approve this nameserver mutation.'),
       },
     },
     async ({ domainName, nameservers }) => {

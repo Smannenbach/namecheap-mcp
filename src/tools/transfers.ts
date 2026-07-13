@@ -28,6 +28,7 @@ export function registerTransferTools(server: McpServer, getClient: () => Namech
         phone: z.string().describe('Registrant phone in +CountryCode.Number format, e.g. "+1.5555551234"'),
         emailAddress: z.string().describe('Registrant email address'),
         addWhoisGuard: z.boolean().optional().describe('Add free WHOIS guard privacy if available (default: true)'),
+        confirmMutation: z.literal(true).describe('Must be true to approve this billable inbound domain transfer.'),
       },
     },
     async ({ domainName, years, eppCode, firstName, lastName, address1, address2, city, stateProvince, postalCode, country, phone, emailAddress, addWhoisGuard }) => {

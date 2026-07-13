@@ -93,16 +93,16 @@ To help you tell at a glance whether the server is actually authenticated, namec
 | `setup` | Configure credentials interactively |
 | `check_domains` | Check availability of one or more domains |
 | `register_domain` | Purchase a new domain |
-| `list_domains` | List all domains in your account (paginated, filterable) |
-| `get_domain_info` | Full details for a single domain |
+| `list_domains` | List all domains in your account (paginated, filterable); exposes the provider's list-level change lock separately, not as transfer-lock authority |
+| `get_domain_info` | Full details combined from exact-match domain list, domain info, and the dedicated registrar-lock endpoint |
 | `get_domain_contacts` | Read WHOIS contact info (registrant, tech, admin, billing) |
 | `set_domain_contacts` | Update WHOIS contact info |
 | `renew_domain` | Renew a domain for 1–10 years |
 | `reactivate_domain` | Reactivate a recently expired domain |
 | `get_tld_list` | Browse supported TLDs; filter by name or registerability |
-| `set_domain_autorenew` | Enable or disable auto-renewal |
-| `set_registrar_lock` | Lock or unlock domain transfer |
-| `set_whoisguard` | Enable or disable WHOIS privacy |
+| `set_domain_autorenew` | Compatibility-only fail-closed response; makes zero provider calls because Namecheap publishes no auto-renew mutation command |
+| `set_registrar_lock` | Lock or unlock domain transfer; requires explicit confirmation, provider acknowledgement, and dedicated post-write readback |
+| `set_whoisguard` | Enable or disable domain privacy; enable also requires a forwarding email, and both paths require explicit confirmation plus post-write readback |
 | `renew_whoisguard` | Renew WHOIS privacy protection |
 
 ### DNS
@@ -120,6 +120,8 @@ To help you tell at a glance whether the server is actually authenticated, namec
 | `restore_dns_snapshot` | Restore a zone from a local backup snapshot |
 
 > ⚠️ **DNS zone safety.** The underlying Namecheap `setHosts` API is a full-replacement operation — any record not in the call is deleted. **Use `update_dns_record` for single-record adds/updates/deletes.** Never hand-call `set_dns_hosts` to add a record. Every read and every write produces a local snapshot at `~/.config/namecheap-mcp/snapshots/<domain>__<timestamp>-<rand>.json` (up to 50 per domain), so `list_dns_snapshots` + `restore_dns_snapshot` can recover from any accidental damage.
+
+> **Provider mutation approval.** Every tool that can change Namecheap state requires an explicit literal confirmation input (`confirmMutation:true` or, for full-replacement operations, `confirmReplaceAll:true`). Read-only tools do not require confirmation. Mutation success is not inferred from the requested value; the hardened domain lock and privacy tools validate Namecheap's acknowledgement and then read the authoritative state back.
 
 ### SSL
 
@@ -150,6 +152,9 @@ To help you tell at a glance whether the server is actually authenticated, namec
 ## API Notes
 
 - DNS tools accept a full domain name like `example.com` — SLD/TLD splitting is handled internally
+- `namecheap.domains.getList.@_IsLocked` is returned as `listChangeLocked`; it is not treated as authoritative transfer-lock state. `get_domain_info.registrarLocked` comes only from `namecheap.domains.getRegistrarLock`.
+- Missing or unrecognized boolean fields are returned as `null`, not silently converted to `false`.
+- Auto-renew and privacy status come from the exact domain match in `namecheap.domains.getList`; transfer lock comes from the dedicated registrar-lock endpoint.
 - Error `1011102` means your `NAMECHEAP_CLIENT_IP` is not whitelisted in the Namecheap dashboard
 - Set `NAMECHEAP_SANDBOX=true` to use `api.sandbox.namecheap.com` for testing
 
